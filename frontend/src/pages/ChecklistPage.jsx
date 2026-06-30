@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import Banner from '../components/Banner';
@@ -18,8 +18,20 @@ const ChecklistPage = () => {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    setEquipment(mockApi.getEquipment().filter(e => e.active));
-    setItems(mockApi.getItems().filter(i => i.active));
+    const loadChecklistData = async () => {
+      try {
+        const [equipmentData, itemData] = await Promise.all([
+          api.getActiveEquipment(),
+          api.getItems(),
+        ]);
+        setEquipment(equipmentData.filter(e => e.active));
+        setItems(itemData.filter(i => i.active));
+      } catch (err) {
+        alert(err.message);
+      }
+    };
+
+    loadChecklistData();
   }, []);
 
   const handleResponseChange = (itemId, status) => {
@@ -64,9 +76,9 @@ const ChecklistPage = () => {
     };
 
     try {
-      mockApi.saveInspection(inspection);
+      await api.saveInspection(inspection);
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       alert('Erro ao salvar inspeção');
     } finally {
       setLoading(false);
@@ -140,8 +152,8 @@ const ChecklistPage = () => {
                     flexDirection: 'column',
                     gap: '10px'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                      <div style={{ flex: '1 1 220px', minWidth: 0 }}>
                         <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.description}</span>
                         {item.is_imperative && (
                           <span style={{
@@ -154,7 +166,7 @@ const ChecklistPage = () => {
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', gap: '5px' }}>
+                      <div style={{ display: 'flex', gap: '5px', flex: '0 0 auto' }}>
                         <button
                           type="button"
                           onClick={() => handleResponseChange(item.id, 'OK')}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Button = ({ children, variant = 'primary', loading = false, ...props }) => {
+const Button = ({ children, variant = 'primary', loading = false, fullWidth = false, style, ...props }) => {
   const baseStyle = {
     padding: '8px 16px',
     borderRadius: '4px',
@@ -12,7 +12,7 @@ const Button = ({ children, variant = 'primary', loading = false, ...props }) =>
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'background-color 0.2s',
-    width: props.fullWidth ? '100%' : 'auto',
+    width: fullWidth ? '100%' : 'auto',
   };
 
   const variants = {
@@ -30,11 +30,11 @@ const Button = ({ children, variant = 'primary', loading = false, ...props }) =>
     }
   };
 
-  const style = { ...baseStyle, ...variants[variant] };
+  const mergedStyle = { ...baseStyle, ...variants[variant], ...style };
 
   return (
     <button
-      style={style}
+      style={mergedStyle}
       disabled={loading || props.disabled}
       onMouseOver={(e) => {
         if (variant === 'primary') e.currentTarget.style.backgroundColor = 'var(--color-accent-hover)';

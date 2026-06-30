@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  master
+  operator
+}
+
+enum InspectionStatus {
+  OK
+  NC
+  IMP
+}
+
+enum ResultAnswer {
+  C
+  NC
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String       @db.VarChar(150)
+  login        String       @unique @db.VarChar(50)
+  email        String?      @db.VarChar(200)
+  passwordHash String       @map("password_hash") @db.Text
+  role         Role
+  active       Boolean      @default(true)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  inspections  Inspection[]
+
+  @@map("users")
+}
+
+model Equipment {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar(120)
+  description String?      @db.VarChar(200)
+  location    String?      @db.VarChar(200)
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  inspections Inspection[]
+
+  @@map("equipment")
+}
+
+model ChecklistItem {
+  id           Int                @id @default(autoincrement())
+  description  String             @unique @db.Text
+  isImperative Boolean            @default(false) @map("is_imperative")
+  active       Boolean            @default(true)
+  orderIndex   Int                @default(0) @map("order_index")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  results      InspectionResult[]
+
+  @@map("checklist_items")
+}
+
+model Inspection {
+  id             Int                @id @default(autoincrement())
+  equipmentId    Int                @map("equipment_id")
+  inspectionDate DateTime           @default(now()) @map("inspection_date")
+  location       String?            @db.VarChar(200)
+  userId         Int                @map("user_id")
+  observations   String?            @db.Text
+  status         InspectionStatus
+  createdAt      DateTime           @default(now()) @map("created_at")
+  equipment      Equipment          @relation(fields: [equipmentId], references: [id])
+  user           User               @relation(fields: [userId], references: [id])
+  results        InspectionResult[]
+
+  @@map("inspections")
+}
+
+model InspectionResult {
+  id           Int          @id @default(autoincrement())
+  inspectionId Int          @map("inspection_id")
+  itemId       Int          @map("item_id")
+  answer       ResultAnswer
+  observation  String?      @db.Text
+  inspection   Inspection   @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  item         ChecklistItem @relation(fields: [itemId], references: [id])
+
+  @@map("inspection_results")
+}

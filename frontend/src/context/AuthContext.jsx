@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const authData = mockApi.getAuthenticatedUser();
+    const authData = api.getAuthenticatedUser();
     if (authData) {
       setUser(authData.user);
     }
@@ -16,13 +16,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const data = await mockApi.login(username, password);
+    const data = await api.login(username, password);
     setUser(data.user);
     return data.user;
   };
 
   const logout = () => {
-    mockApi.logout();
+    api.logout();
     setUser(null);
   };
 
