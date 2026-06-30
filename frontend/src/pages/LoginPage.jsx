@@ -17,8 +17,8 @@ const LoginPage = () => {
     setError('');
     setLoading(true);
     try {
-      await login(username, password);
-      navigate('/checklist');
+      const loggedUser = await login(username, password);
+      navigate(loggedUser.role === 'master' ? '/dashboard' : '/checklist');
     } catch (err) {
       setError(err.message);
     } finally {

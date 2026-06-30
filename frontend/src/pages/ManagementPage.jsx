@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import Badge from '../components/Badge';
@@ -11,15 +11,19 @@ const ManagementPage = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    loadData();
+  const loadData = useCallback(async () => {
+    try {
+      if (activeTab === 'users') setData(await api.getUsers());
+      else if (activeTab === 'equipment') setData(await api.getEquipment());
+      else if (activeTab === 'items') setData(await api.getAllItems());
+    } catch (err) {
+      alert(err.message);
+    }
   }, [activeTab]);
 
-  const loadData = () => {
-    if (activeTab === 'users') setData(mockApi.getUsers());
-    else if (activeTab === 'equipment') setData(mockApi.getEquipment());
-    else if (activeTab === 'items') setData(mockApi.getItems());
-  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const tabs = [
     { id: 'users', label: 'Usuários', icon: <Users size={16} /> },

@@ -1,35 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
 
 const DashboardPage = () => {
   const { user, logout } = useAuth();
-  const [stats, setStats] = useState({ total: 0, ok: 0, nc: 0, imp: 0 });
+  const [stats, setStats] = useState({ total: 0, ok: 0, nc: 0, imp: 0, conformity: 0 });
   const [recentInspections, setRecentInspections] = useState([]);
 
   useEffect(() => {
-    const inspections = mockApi.getInspections();
-    const equipment = mockApi.getEquipment();
-    const users = mockApi.getUsers();
+    const loadDashboard = async () => {
+      try {
+        const [summary, recent] = await Promise.all([
+          api.getDashboardSummary(),
+          api.getDashboardRecent(),
+        ]);
+        setStats(summary);
+        setRecentInspections(recent);
+      } catch (err) {
+        alert(err.message);
+      }
+    };
 
-    const totals = inspections.reduce((acc, curr) => {
-      acc.total++;
-      if (curr.status === 'OK') acc.ok++;
-      if (curr.status === 'NC') acc.nc++;
-      if (curr.status === 'IMP') acc.imp++;
-      return acc;
-    }, { total: 0, ok: 0, nc: 0, imp: 0 });
-
-    setStats(totals);
-
-    const enriched = inspections.slice(-5).reverse().map(insp => ({
-      ...insp,
-      equipmentName: equipment.find(e => e.id == insp.equipment_id)?.name,
-      userName: users.find(u => u.id == insp.user_id)?.name
-    }));
-    setRecentInspections(enriched);
+    loadDashboard();
   }, []);
 
   return (
@@ -45,8 +39,8 @@ const DashboardPage = () => {
             <div style={{ fontSize: '32px', fontWeight: '700', marginTop: '10px' }}>{stats.total}</div>
           </div>
           <div className="card" style={{ textAlign: 'center', borderTop: '4px solid var(--color-success)' }}>
-            <span className="section-label">Liberadas (OK)</span>
-            <div style={{ fontSize: '32px', fontWeight: '700', marginTop: '10px', color: 'var(--color-success)' }}>{stats.ok}</div>
+            <span className="section-label">% Conformidade</span>
+            <div style={{ fontSize: '32px', fontWeight: '700', marginTop: '10px', color: 'var(--color-success)' }}>{stats.conformity}%</div>
           </div>
           <div className="card" style={{ textAlign: 'center', borderTop: '4px solid var(--color-warning)' }}>
             <span className="section-label">Atenção (NC)</span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { LogOut, User } from 'lucide-react';
 import Badge from './Badge';
 
@@ -27,7 +27,8 @@ const Navbar = ({ user, onLogout }) => {
           {user?.role === 'master' && (
             <>
               <Link to="/dashboard" style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>Dashboard</Link>
-              <Link to="/history" style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>Relatórios</Link>
+              <Link to="/history" style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>Histórico</Link>
+              <Link to="/reports" style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>Relatórios</Link>
               <Link to="/management" style={{ fontSize: '14px', color: 'var(--color-text-primary)' }}>Gestão</Link>
             </>
           )}

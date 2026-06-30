@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import Navbar from '../components/Navbar';
 import Badge from '../components/Badge';
 import { Search, Download } from 'lucide-react';
@@ -11,17 +11,15 @@ const HistoryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const data = mockApi.getInspections();
-    const equipment = mockApi.getEquipment();
-    const users = mockApi.getUsers();
+    const loadInspections = async () => {
+      try {
+        setInspections(await api.getInspections());
+      } catch (err) {
+        alert(err.message);
+      }
+    };
 
-    const enriched = data.map(insp => ({
-      ...insp,
-      equipmentName: equipment.find(e => e.id == insp.equipment_id)?.name,
-      userName: users.find(u => u.id == insp.user_id)?.name
-    })).reverse();
-
-    setInspections(enriched);
+    loadInspections();
   }, []);
 
   const filteredInspections = inspections.filter(insp =>
@@ -37,7 +35,7 @@ const HistoryPage = () => {
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <h1>Histórico de Inspeções</h1>
-          <button style={{
+          <button onClick={() => api.downloadReportExcel()} style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
