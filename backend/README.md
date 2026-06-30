@@ -16,7 +16,7 @@ npm install
 cp .env.example .env
 ```
 
-3. Ajuste `DATABASE_URL`, `JWT_SECRET` e `CORS_ORIGIN` no `.env`.
+3. Ajuste `DATABASE_URL`, `JWT_SECRET` e `CORS_ORIGIN` no `.env`. O Docker Compose deste projeto publica o Postgres em `localhost:5434`.
 
 4. Se não tiver PostgreSQL local, suba o banco pela raiz do projeto:
 
