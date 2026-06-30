@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import ChecklistPage from './pages/ChecklistPage';
@@ -32,6 +33,14 @@ function App() {
           <Route path="/" element={<Navigate to="/checklist" />} />
         </Routes>
       </Router>
+      <ToastContainer
+        position="top-right"
+        theme="dark"
+        autoClose={2600}
+        closeOnClick
+        pauseOnHover
+        newestOnTop
+      />
     </AuthProvider>
   );
 }

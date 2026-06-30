@@ -152,8 +152,8 @@ const ChecklistPage = () => {
                     flexDirection: 'column',
                     gap: '10px'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                      <div style={{ flex: '1 1 220px', minWidth: 0 }}>
                         <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.description}</span>
                         {item.is_imperative && (
                           <span style={{
@@ -166,7 +166,7 @@ const ChecklistPage = () => {
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', gap: '5px' }}>
+                      <div style={{ display: 'flex', gap: '5px', flex: '0 0 auto' }}>
                         <button
                           type="button"
                           onClick={() => handleResponseChange(item.id, 'OK')}

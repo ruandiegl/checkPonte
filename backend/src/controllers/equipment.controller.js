@@ -16,3 +16,7 @@ export const update = asyncHandler(async (req, res) => {
 export const toggle = asyncHandler(async (req, res) => {
   res.json(await equipmentService.toggleEquipment(req.params.id));
 });
+
+export const remove = asyncHandler(async (req, res) => {
+  res.json(await equipmentService.deleteEquipment(req.params.id));
+});

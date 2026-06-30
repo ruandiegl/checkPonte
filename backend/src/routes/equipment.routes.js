@@ -24,3 +24,4 @@ equipmentRoutes.put(
   controller.update,
 );
 equipmentRoutes.patch('/:id/toggle', roleMiddleware('master'), param('id').isInt(), validateRequest, controller.toggle);
+equipmentRoutes.delete('/:id', roleMiddleware('master'), param('id').isInt(), validateRequest, controller.remove);

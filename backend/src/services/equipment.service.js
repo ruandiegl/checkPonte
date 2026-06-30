@@ -1,4 +1,5 @@
 import { prisma } from '../config/prisma.js';
+import { AppError } from '../utils/AppError.js';
 import { mapEquipment } from './mappers.js';
 
 export async function listEquipment({ includeInactive = false } = {}) {
@@ -45,4 +46,14 @@ export async function toggleEquipment(id) {
   });
 
   return mapEquipment(equipment);
+}
+
+export async function deleteEquipment(id) {
+  const linkedInspections = await prisma.inspection.count({ where: { equipmentId: Number(id) } });
+  if (linkedInspections > 0) {
+    throw new AppError('Equipamento possui inspeções vinculadas. Não é possível excluir sem perder histórico.', 409);
+  }
+
+  await prisma.equipment.delete({ where: { id: Number(id) } });
+  return { message: 'Equipamento excluído com sucesso' };
 }

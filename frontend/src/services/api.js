@@ -69,19 +69,39 @@ export const api = {
 
   getUsers: async () => (await apiClient.get('/users')).data,
   saveUser: async (user) => (user.id ? (await apiClient.put(`/users/${user.id}`, user)).data : (await apiClient.post('/users', user)).data),
+  updateUserPassword: async (id, password) => (await apiClient.patch(`/users/${id}/password`, { password })).data,
+  deleteUser: async (id) => (await apiClient.delete(`/users/${id}`)).data,
   getEquipment: async () => (await apiClient.get('/equipment?all=true')).data,
   getActiveEquipment: async () => (await apiClient.get('/equipment')).data,
+  saveEquipment: async (equipment) => (equipment.id ? (await apiClient.put(`/equipment/${equipment.id}`, equipment)).data : (await apiClient.post('/equipment', equipment)).data),
+  toggleEquipment: async (id) => (await apiClient.patch(`/equipment/${id}/toggle`)).data,
+  deleteEquipment: async (id) => (await apiClient.delete(`/equipment/${id}`)).data,
   getItems: async () => (await apiClient.get('/items')).data,
   getAllItems: async () => (await apiClient.get('/items/all')).data,
+  saveItem: async (item) => (item.id ? (await apiClient.put(`/items/${item.id}`, item)).data : (await apiClient.post('/items', item)).data),
+  toggleItem: async (id) => (await apiClient.patch(`/items/${id}/toggle`)).data,
+  deleteItem: async (id) => (await apiClient.delete(`/items/${id}`)).data,
   saveInspection: async (inspection) => (await apiClient.post('/inspections', inspection)).data,
   getInspections: async (params) => {
     const query = buildQuery(params);
     return (await apiClient.get(`/inspections${query ? `?${query}` : ''}`)).data;
   },
-  getDashboardSummary: async () => (await apiClient.get('/dashboard/summary')).data,
-  getDashboardByCrane: async () => (await apiClient.get('/dashboard/by-crane')).data,
-  getDashboardTopNcItems: async () => (await apiClient.get('/dashboard/top-nc-items')).data,
-  getDashboardRecent: async () => (await apiClient.get('/dashboard/recent')).data,
+  getDashboardSummary: async (params) => {
+    const query = buildQuery(params);
+    return (await apiClient.get(`/dashboard/summary${query ? `?${query}` : ''}`)).data;
+  },
+  getDashboardByCrane: async (params) => {
+    const query = buildQuery(params);
+    return (await apiClient.get(`/dashboard/by-crane${query ? `?${query}` : ''}`)).data;
+  },
+  getDashboardTopNcItems: async (params) => {
+    const query = buildQuery(params);
+    return (await apiClient.get(`/dashboard/top-nc-items${query ? `?${query}` : ''}`)).data;
+  },
+  getDashboardRecent: async (params) => {
+    const query = buildQuery(params);
+    return (await apiClient.get(`/dashboard/recent${query ? `?${query}` : ''}`)).data;
+  },
   getReport: async (params) => {
     const query = buildQuery(params);
     return (await apiClient.get(`/reports${query ? `?${query}` : ''}`)).data;
