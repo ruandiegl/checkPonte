@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { TrendingUp } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -61,7 +62,7 @@ const DashboardPage = () => {
         setTopItems(itemData);
         setRecentInspections(recent);
       } catch (err) {
-        alert(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }

@@ -1,18 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { BarChart3, ClipboardCheck, FileText, History, LogOut, Settings } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import Badge from './Badge';
+import vulcanoLogo from '../assets/vulcano-logo-transparent.png';
+import { getNavigationLinks } from '../utils/navigation';
 
 const Navbar = ({ user, onLogout }) => {
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
-
-  const links = [
-    { to: '/checklist', label: 'Checklist', shortLabel: 'Checklist', icon: ClipboardCheck, show: true },
-    { to: '/dashboard', label: 'Dashboard', shortLabel: 'Painel', icon: BarChart3, show: user?.role === 'master' },
-    { to: '/history', label: 'Histórico', shortLabel: 'Histórico', icon: History, show: user?.role === 'master' },
-    { to: '/reports', label: 'Relatórios', shortLabel: 'Relatórios', icon: FileText, show: user?.role === 'master' },
-    { to: '/management', label: 'Gestão', shortLabel: 'Gestão', icon: Settings, show: user?.role === 'master' },
-  ].filter((link) => link.show);
+  const links = getNavigationLinks(user);
 
   const initials = user?.name
     ?.split(' ')
@@ -27,8 +22,7 @@ const Navbar = ({ user, onLogout }) => {
       <nav className="navbar">
         <div className="navbar-main">
           <NavLink to="/checklist" className="navbar-brand">
-            <span className="navbar-mark">V</span>
-            <span>VULCANO</span>
+            <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="navbar-logo" />
           </NavLink>
 
           <div className="navbar-desktop-links">
@@ -77,7 +71,15 @@ const Navbar = ({ user, onLogout }) => {
       </nav>
 
       {showLogoutConfirm && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="logout-modal-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) setShowLogoutConfirm(false);
+          }}
+        >
           <div className="modal-panel" style={{ width: 'min(420px, 100%)' }}>
             <div className="modal-header">
               <div>
@@ -98,7 +100,7 @@ const Navbar = ({ user, onLogout }) => {
             </div>
 
             <div className="modal-footer">
-              <button type="button" onClick={() => setShowLogoutConfirm(false) } style={{ backgroundColor: '#AAAAAA', color: '#333333'}}>
+              <button type="button" onClick={() => setShowLogoutConfirm(false)} style={{ backgroundColor: '#AAAAAA', color: '#333333' }}>
                 Cancelar
               </button>
               <button type="button" onClick={onLogout} style={{ backgroundColor: 'var(--color-danger)', color: '#fff' }}>

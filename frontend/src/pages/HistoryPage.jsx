@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FileSpreadsheet, FileText, Search, X } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -37,7 +38,7 @@ const HistoryPage = () => {
       try {
         setInspections(await api.getInspections());
       } catch (err) {
-        alert(err.message);
+        toast.error(err.message);
       }
     };
 
@@ -71,9 +72,17 @@ const HistoryPage = () => {
       if (type === 'pdf') await api.downloadReportPdf(exportParams);
       if (type === 'excel') await api.downloadReportExcel(exportParams);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setDownloading('');
+    }
+  };
+
+  const openDetails = async (inspection) => {
+    try {
+      setSelectedInspection(await api.getInspection(inspection.id));
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
@@ -141,7 +150,7 @@ const HistoryPage = () => {
                     <td style={{ padding: '12px' }}>
                       <button
                         type="button"
-                        onClick={() => setSelectedInspection(inspection)}
+                        onClick={() => openDetails(inspection)}
                         style={{ background: 'none', border: 'none', color: 'var(--color-accent)', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}
                       >
                         Ver detalhes
@@ -185,7 +194,7 @@ const HistoryPage = () => {
                 <button
                   type="button"
                   className="mobile-record-action"
-                  onClick={() => setSelectedInspection(inspection)}
+                  onClick={() => openDetails(inspection)}
                   style={{ display: 'flex', background: 'var(--color-bg-header)', border: '1px solid var(--color-border)', color: 'var(--color-accent)', cursor: 'pointer', fontSize: '12px', fontWeight: '700' }}
                 >
                   Ver detalhes
@@ -202,7 +211,15 @@ const HistoryPage = () => {
       </div>
 
       {selectedInspection && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="inspection-modal-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="inspection-modal-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) setSelectedInspection(null);
+          }}
+        >
           <div className="modal-panel">
             <div className="modal-header">
               <div>
@@ -246,6 +263,14 @@ const HistoryPage = () => {
                   <span className="detail-label">Data da inspeção</span>
                   <span className="detail-value">{new Date(selectedInspection.inspection_date || selectedInspection.created_at).toLocaleString('pt-BR')}</span>
                 </div>
+                <div className="detail-field">
+                  <span className="detail-label">Última edição</span>
+                  <span className="detail-value">
+                    {selectedInspection.updated_at && Math.abs(new Date(selectedInspection.updated_at) - new Date(selectedInspection.created_at)) > 1000
+                      ? new Date(selectedInspection.updated_at).toLocaleString('pt-BR')
+                      : 'Sem edição'}
+                  </span>
+                </div>
               </div>
 
               {selectedInspection.observations && (
@@ -286,6 +311,41 @@ const HistoryPage = () => {
                 {(selectedInspection.results || []).length === 0 && (
                   <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>Nenhum item encontrado para esta inspeção.</p>
                 )}
+              </div>
+
+              <div style={{ marginTop: '18px' }}>
+                <label className="section-label">Auditoria</label>
+                <div style={{ display: 'grid', gap: '10px', marginTop: '10px' }}>
+                  {(selectedInspection.audits || []).map((audit) => (
+                    <div
+                      key={audit.id}
+                      style={{
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '8px',
+                        backgroundColor: 'var(--color-bg-header)',
+                        padding: '12px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                        <strong style={{ fontSize: '13px' }}>{audit.actorName || `Usuário #${audit.actor_id}`}</strong>
+                        <span style={{ color: 'var(--color-text-secondary)', fontSize: '12px' }}>
+                          {new Date(audit.created_at).toLocaleString('pt-BR')}
+                        </span>
+                      </div>
+                      <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', marginTop: '8px', lineHeight: 1.45 }}>
+                        Status: {audit.before?.status || '-'} → {audit.after?.status || '-'}
+                      </p>
+                      {(audit.after?.observations || audit.before?.observations) && (
+                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', marginTop: '6px', lineHeight: 1.45 }}>
+                          Observações: {audit.before?.observations || '-'} → {audit.after?.observations || '-'}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                  {(selectedInspection.audits || []).length === 0 && (
+                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>Nenhuma edição registrada.</p>
+                  )}
+                </div>
               </div>
             </div>
 

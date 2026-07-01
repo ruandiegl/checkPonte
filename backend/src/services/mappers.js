@@ -48,6 +48,7 @@ export function mapInspection(inspection) {
     observations: inspection.observations,
     status: inspection.status,
     created_at: inspection.createdAt,
+    updated_at: inspection.updatedAt,
     results: inspection.results?.map((result) => ({
       id: result.id,
       check_item_id: result.itemId,
@@ -57,6 +58,15 @@ export function mapInspection(inspection) {
       answer: result.answer,
       status: result.answer === 'C',
       observation: result.observation,
+    })),
+    audits: inspection.audits?.map((audit) => ({
+      id: audit.id,
+      action: audit.action,
+      actor_id: audit.actorId,
+      actorName: audit.actor?.name,
+      before: audit.before,
+      after: audit.after,
+      created_at: audit.createdAt,
     })),
   };
 }

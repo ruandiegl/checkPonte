@@ -1,12 +1,14 @@
 import React from 'react';
 
-const Input = ({ label, ...props }) => {
+const Input = React.forwardRef(({ label, ...props }, ref) => {
   return (
     <div style={{ marginBottom: '16px' }}>
       {label && <label className="section-label">{label}</label>}
-      <input {...props} />
+      <input ref={ref} {...props} />
     </div>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;
