@@ -48,7 +48,7 @@ const LoginPage = () => {
       justifyContent: 'center',
       backgroundColor: 'var(--color-bg-primary)'
     }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+      <div className="card login-card" style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-logo" />
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', marginTop: '5px' }}>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
