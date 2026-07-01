@@ -492,7 +492,15 @@ const ManagementPage = () => {
       </div>
 
       {modalMode && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="management-modal-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="management-modal-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
           <div className="modal-panel">
             <div className="modal-header">
               <div>
@@ -526,7 +534,15 @@ const ManagementPage = () => {
       )}
 
       {confirmAction && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-modal-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) setConfirmAction(null);
+          }}
+        >
           <div className="modal-panel" style={{ width: 'min(440px, 100%)' }}>
             <div className="modal-header">
               <div>

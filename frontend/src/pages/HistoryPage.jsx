@@ -211,7 +211,15 @@ const HistoryPage = () => {
       </div>
 
       {selectedInspection && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="inspection-modal-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="inspection-modal-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) setSelectedInspection(null);
+          }}
+        >
           <div className="modal-panel">
             <div className="modal-header">
               <div>

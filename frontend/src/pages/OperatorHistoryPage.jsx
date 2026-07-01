@@ -208,7 +208,15 @@ const OperatorHistoryPage = () => {
       </div>
 
       {selectedInspection && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="operator-details-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="operator-details-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) setSelectedInspection(null);
+          }}
+        >
           <div className="modal-panel">
             <div className="modal-header">
               <div>
@@ -265,7 +273,15 @@ const OperatorHistoryPage = () => {
       )}
 
       {editingInspection && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="operator-edit-title">
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="operator-edit-title"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) closeEdit();
+          }}
+        >
           <div className="modal-panel">
             <div className="modal-header">
               <div>

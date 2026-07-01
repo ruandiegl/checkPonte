@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import SwipeNavigation from './components/SwipeNavigation';
 import LoginPage from './pages/LoginPage';
 import ChecklistPage from './pages/ChecklistPage';
 import DashboardPage from './pages/DashboardPage';
@@ -24,6 +25,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <SwipeNavigation />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/checklist" element={<PrivateRoute><ChecklistPage /></PrivateRoute>} />
