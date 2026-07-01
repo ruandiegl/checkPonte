@@ -113,7 +113,7 @@ const ChecklistPage = () => {
 
   if (submitted) {
     return (
-      <div style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100vh' }}>
+      <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
         <Navbar user={user} onLogout={logout} />
         <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>
           <div className="card" style={{ maxWidth: '500px', margin: '0 auto' }}>
@@ -130,7 +130,7 @@ const ChecklistPage = () => {
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100vh' }}>
+    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container">

@@ -94,7 +94,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100vh' }}>
+    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container" style={{ maxWidth: '660px', paddingTop: '18px' }}>
