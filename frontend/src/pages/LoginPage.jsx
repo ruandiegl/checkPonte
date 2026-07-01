@@ -1,9 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import Button from '../components/Button';
-import Input from '../components/Input';
+import { useAuth } from '../context/AuthContext';
 import vulcanoLogo from '../assets/vulcano-logo-transparent.png';
 
 const LoginPage = () => {
@@ -15,8 +13,9 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
     if (!username.trim()) {
       toast.warning('Informe o usuário para entrar.');
       usernameRef.current?.focus();
@@ -41,41 +40,50 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-brand">
-        <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-logo" />
-        <p>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
-      </div>
+    <div className="login-page-bg">
+      <main className="login-card-container" aria-label="Acesso ao sistema Vulcano">
+        <section className="login-brand-panel">
+          <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-card-logo" />
+        </section>
 
-      <div className="card login-card" style={{ width: '100%', maxWidth: '400px' }}>
-        <form onSubmit={handleSubmit} noValidate>
-          <Input
-            ref={usernameRef}
-            label="USUÁRIO"
-            placeholder="Digite seu usuário"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <Input
-            ref={passwordRef}
-            label="SENHA"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <section className="login-form-panel">
+          <p className="login-system-title">SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
 
-          <Button type="submit" fullWidth loading={loading}>
-            ENTRAR
-          </Button>
-        </form>
+          <form className="login-form" onSubmit={handleSubmit} noValidate>
+            <label className="login-field">
+              <span>USUÁRIO</span>
+              <input
+                ref={usernameRef}
+                type="text"
+                className="login-input-v3"
+                placeholder="Digite seu usuário"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                autoComplete="username"
+              />
+            </label>
 
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '11px', textAlign: 'center', marginTop: '20px' }}>
-          Vulcano Industrial © 2026
-        </p>
-      </div>
+            <label className="login-field">
+              <span>SENHA</span>
+              <input
+                ref={passwordRef}
+                type="password"
+                className="login-input-v3"
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+              />
+            </label>
+
+            <button type="submit" disabled={loading} className="login-button-v3">
+              {loading ? 'CARREGANDO...' : 'ENTRAR'}
+            </button>
+          </form>
+
+          <p className="login-footer">Vulcano Industrial © 2026</p>
+        </section>
+      </main>
     </div>
   );
 };
