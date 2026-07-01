@@ -28,13 +28,14 @@ const LoginPage = () => {
 
   return (
     <div style={{
-      height: '100vh',
+      minHeight: '100dvh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'var(--color-bg-primary)'
+      backgroundColor: 'var(--color-bg-primary)',
+      padding: '20px'
     }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+      <div className="card" style={{ width: '100%', maxWidth: '400px', margin: 'auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ color: 'var(--color-accent)', letterSpacing: '2px', fontSize: '28px' }}>VULCANO</h1>
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', marginTop: '5px' }}>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>

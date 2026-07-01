@@ -504,7 +504,7 @@ input:focus, select:focus, textarea:focus {
     font-size: 22px;
   }
 
-  body {
+  .has-bottom-nav {
     padding-bottom: calc(74px + env(safe-area-inset-bottom));
   }
 
