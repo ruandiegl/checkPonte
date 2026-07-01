@@ -41,19 +41,13 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{
-      height: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'var(--color-bg-primary)'
-    }}>
-      <div className="card login-card" style={{ width: '100%', maxWidth: '400px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-logo" />
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', marginTop: '5px' }}>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
-        </div>
+    <div className="login-page">
+      <div className="login-brand">
+        <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-logo" />
+        <p>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
+      </div>
 
+      <div className="card login-card" style={{ width: '100%', maxWidth: '400px' }}>
         <form onSubmit={handleSubmit} noValidate>
           <Input
             ref={usernameRef}
