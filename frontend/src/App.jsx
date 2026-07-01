@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import ChecklistPage from './pages/ChecklistPage';
 import DashboardPage from './pages/DashboardPage';
 import HistoryPage from './pages/HistoryPage';
+import OperatorHistoryPage from './pages/OperatorHistoryPage';
 import ManagementPage from './pages/ManagementPage';
 import ReportsPage from './pages/ReportsPage';
 
@@ -26,11 +27,13 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/checklist" element={<PrivateRoute><ChecklistPage /></PrivateRoute>} />
+          <Route path="/my-history" element={<PrivateRoute><OperatorHistoryPage /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute role="master"><DashboardPage /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute role="master"><HistoryPage /></PrivateRoute>} />
           <Route path="/reports" element={<PrivateRoute role="master"><ReportsPage /></PrivateRoute>} />
           <Route path="/management" element={<PrivateRoute role="master"><ManagementPage /></PrivateRoute>} />
           <Route path="/" element={<Navigate to="/checklist" />} />
+          <Route path="*" element={<Navigate to="/checklist" replace />} />
         </Routes>
       </Router>
       <ToastContainer

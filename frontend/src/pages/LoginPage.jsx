@@ -1,26 +1,40 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import vulcanoLogo from '../assets/vulcano-logo-transparent.png';
 
 const LoginPage = () => {
+  const usernameRef = useRef(null);
+  const passwordRef = useRef(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (!username.trim()) {
+      toast.warning('Informe o usuário para entrar.');
+      usernameRef.current?.focus();
+      return;
+    }
+    if (!password.trim()) {
+      toast.warning('Informe a senha para entrar.');
+      passwordRef.current?.focus();
+      return;
+    }
+
     setLoading(true);
     try {
       const loggedUser = await login(username, password);
       navigate(loggedUser.role === 'master' ? '/dashboard' : '/checklist');
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
+      passwordRef.current?.focus();
     } finally {
       setLoading(false);
     }
@@ -36,12 +50,13 @@ const LoginPage = () => {
     }}>
       <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ color: 'var(--color-accent)', letterSpacing: '2px', fontSize: '28px' }}>VULCANO</h1>
+          <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-logo" />
           <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', marginTop: '5px' }}>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <Input
+            ref={usernameRef}
             label="USUÁRIO"
             placeholder="Digite seu usuário"
             value={username}
@@ -49,6 +64,7 @@ const LoginPage = () => {
             required
           />
           <Input
+            ref={passwordRef}
             label="SENHA"
             type="password"
             placeholder="••••••••"
@@ -56,12 +72,6 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
-          {error && (
-            <div style={{ color: 'var(--color-danger)', fontSize: '13px', marginBottom: '15px', textAlign: 'center' }}>
-              {error}
-            </div>
-          )}
 
           <Button type="submit" fullWidth loading={loading}>
             ENTRAR

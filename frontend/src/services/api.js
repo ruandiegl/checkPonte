@@ -86,6 +86,8 @@ export const api = {
     const query = buildQuery(params);
     return (await apiClient.get(`/inspections${query ? `?${query}` : ''}`)).data;
   },
+  getInspection: async (id) => (await apiClient.get(`/inspections/${id}`)).data,
+  updateInspection: async (id, inspection) => (await apiClient.put(`/inspections/${id}`, inspection)).data,
   getDashboardSummary: async (params) => {
     const query = buildQuery(params);
     return (await apiClient.get(`/dashboard/summary${query ? `?${query}` : ''}`)).data;

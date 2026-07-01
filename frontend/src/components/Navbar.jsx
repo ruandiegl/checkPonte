@@ -2,12 +2,14 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { BarChart3, ClipboardCheck, FileText, History, LogOut, Settings } from 'lucide-react';
 import Badge from './Badge';
+import vulcanoLogo from '../assets/vulcano-logo-transparent.png';
 
 const Navbar = ({ user, onLogout }) => {
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
 
   const links = [
     { to: '/checklist', label: 'Checklist', shortLabel: 'Checklist', icon: ClipboardCheck, show: true },
+    { to: '/my-history', label: 'Meu histórico', shortLabel: 'Histórico', icon: History, show: user?.role === 'operator' },
     { to: '/dashboard', label: 'Dashboard', shortLabel: 'Painel', icon: BarChart3, show: user?.role === 'master' },
     { to: '/history', label: 'Histórico', shortLabel: 'Histórico', icon: History, show: user?.role === 'master' },
     { to: '/reports', label: 'Relatórios', shortLabel: 'Relatórios', icon: FileText, show: user?.role === 'master' },
@@ -27,8 +29,7 @@ const Navbar = ({ user, onLogout }) => {
       <nav className="navbar">
         <div className="navbar-main">
           <NavLink to="/checklist" className="navbar-brand">
-            <span className="navbar-mark">V</span>
-            <span>VULCANO</span>
+            <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="navbar-logo" />
           </NavLink>
 
           <div className="navbar-desktop-links">

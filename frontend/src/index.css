@@ -156,6 +156,13 @@ input:focus, select:focus, textarea:focus {
   white-space: nowrap;
 }
 
+.navbar-logo {
+  display: block;
+  width: 148px;
+  max-width: 34vw;
+  height: auto;
+}
+
 .navbar-brand:hover {
   color: var(--color-text-primary);
 }
@@ -165,6 +172,13 @@ input:focus, select:focus, textarea:focus {
   font-size: 24px;
   line-height: 1;
   letter-spacing: 0;
+}
+
+.login-logo {
+  display: block;
+  width: min(260px, 86%);
+  height: auto;
+  margin: 0 auto 12px;
 }
 
 .navbar-desktop-links {
@@ -333,7 +347,26 @@ input:focus, select:focus, textarea:focus {
 .mobile-record-action {
   margin-top: 12px;
   width: 100%;
+  min-height: 42px;
+  align-items: center;
+  border-radius: 6px;
+  display: inline-flex;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 800;
   justify-content: center;
+}
+
+.operator-action-primary {
+  background-color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  color: #111;
+}
+
+.operator-action-secondary {
+  background-color: #f2f2f2;
+  border: 1px solid #f2f2f2;
+  color: #111;
 }
 
 .action-group {
@@ -498,6 +531,11 @@ input:focus, select:focus, textarea:focus {
 
   .navbar-brand {
     font-size: 13px;
+  }
+
+  .navbar-logo {
+    width: 124px;
+    max-width: 42vw;
   }
 
   .navbar-mark {

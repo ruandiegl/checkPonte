@@ -16,3 +16,10 @@ inspectionRoutes.post(
   validateRequest,
   controller.create,
 );
+inspectionRoutes.put(
+  '/:id',
+  param('id').isInt(),
+  body('results').isArray({ min: 1 }),
+  validateRequest,
+  controller.update,
+);

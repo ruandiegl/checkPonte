@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -8,6 +9,8 @@ import Badge from '../components/Badge';
 
 const ChecklistPage = () => {
   const { user, logout } = useAuth();
+  const equipmentSectionRef = useRef(null);
+  const equipmentSelectRef = useRef(null);
   const [equipment, setEquipment] = useState([]);
   const [items, setItems] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState('');
@@ -27,7 +30,7 @@ const ChecklistPage = () => {
         setEquipment(equipmentData.filter(e => e.active));
         setItems(itemData.filter(i => i.active));
       } catch (err) {
-        alert(err.message);
+        toast.error(err.message);
       }
     };
 
@@ -51,8 +54,22 @@ const ChecklistPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedEquipment) return alert('Selecione um equipamento');
-    if (Object.keys(responses).length < items.length) return alert('Responda a todos os itens');
+    if (!selectedEquipment) {
+      toast.warning('Selecione um equipamento para continuar.');
+      equipmentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.setTimeout(() => equipmentSelectRef.current?.focus(), 350);
+      return;
+    }
+    if (Object.keys(responses).length < items.length) {
+      toast.warning('Responda todos os itens antes de finalizar.');
+      return;
+    }
+
+    const missingNcObservation = items.find((item) => responses[item.id] === 'NC' && !observations[item.id]?.trim());
+    if (missingNcObservation) {
+      toast.warning('Descreva a não conformidade dos itens marcados como NC.');
+      return;
+    }
 
     setLoading(true);
 
@@ -77,12 +94,21 @@ const ChecklistPage = () => {
 
     try {
       await api.saveInspection(inspection);
+      toast.success('Checklist enviado com sucesso.');
       setSubmitted(true);
-    } catch {
-      alert('Erro ao salvar inspeção');
+    } catch (err) {
+      toast.error(err.message || 'Erro ao salvar inspeção.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetChecklist = () => {
+    setSelectedEquipment('');
+    setResponses({});
+    setObservations({});
+    setShowImperativeAlert(false);
+    setSubmitted(false);
   };
 
   if (submitted) {
@@ -96,7 +122,7 @@ const ChecklistPage = () => {
             <p style={{ color: 'var(--color-text-secondary)', margin: '20px 0' }}>
               Os dados foram registrados e estão disponíveis para consulta da gestão.
             </p>
-            <Button onClick={() => window.location.reload()} fullWidth>Nova Inspeção</Button>
+            <Button onClick={resetChecklist} fullWidth>Nova Inspeção</Button>
           </div>
         </div>
       </div>
@@ -116,12 +142,13 @@ const ChecklistPage = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="card" style={{ marginBottom: '20px' }}>
+          <form onSubmit={handleSubmit} noValidate>
+            <div ref={equipmentSectionRef} className="card" style={{ marginBottom: '20px' }}>
               <label className="section-label">Dados da Inspeção</label>
               <div style={{ marginTop: '15px' }}>
                 <label style={{ fontSize: '13px', display: 'block', marginBottom: '5px' }}>Equipamento</label>
                 <select
+                  ref={equipmentSelectRef}
                   value={selectedEquipment}
                   onChange={(e) => setSelectedEquipment(e.target.value)}
                   required

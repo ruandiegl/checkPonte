@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -33,7 +34,7 @@ const ReportsPage = () => {
     try {
       setReport(await api.getReport(params));
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -54,7 +55,7 @@ const ReportsPage = () => {
       if (type === 'pdf') await api.downloadReportPdf(params);
       if (type === 'excel') await api.downloadReportExcel(params);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setDownloading('');
     }
