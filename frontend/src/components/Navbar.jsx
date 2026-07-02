@@ -22,7 +22,9 @@ const Navbar = ({ user, onLogout }) => {
       <nav className="navbar">
         <div className="navbar-main">
           <NavLink to="/checklist" className="navbar-brand">
-            <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="navbar-logo" />
+            <span className="navbar-brand-surface">
+              <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="navbar-logo" />
+            </span>
           </NavLink>
 
           <div className="navbar-desktop-links">
