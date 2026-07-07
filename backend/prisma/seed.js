@@ -1,10 +1,18 @@
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash('vulcano123', 12);
+  const seedPassword = process.env.SEED_DEFAULT_PASSWORD;
+  if (!seedPassword || seedPassword.length < 8) {
+    throw new Error('SEED_DEFAULT_PASSWORD deve estar configurado com pelo menos 8 caracteres.');
+  }
+
+  const passwordHash = await bcrypt.hash(seedPassword, 12);
 
   await prisma.user.upsert({
     where: { login: 'admin' },

@@ -6,7 +6,7 @@ export function validateRequest(req, _res, next) {
 
   return next({
     statusCode: 422,
-    message: 'Dados inválidos',
+    message: 'Usuário ou senha invalido.',
     details: errors.array(),
   });
 }
