@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Edit3, Eye, X } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api';
-import Navbar from '../components/Navbar';
-import Badge from '../components/Badge';
-import Button from '../components/Button';
+import { useAuth } from '../../context';
+import { api } from '../../services/api';
+import Navbar from '../../components/Navbar';
+import Badge from '../../components/Badge';
+import Button from '../../components/Button';
+import { PageRoot } from './styles';
+import type { Inspection, InspectionAnswer } from '../../types/domain';
+import { getErrorMessage } from '../../types/domain';
 
-function inspectionTotals(inspection) {
+function inspectionTotals(inspection: Inspection) {
   return (inspection.results || []).reduce(
     (acc, result) => {
       if (result.answer === 'NC' || result.status === false) acc.nc += 1;
@@ -18,18 +21,18 @@ function inspectionTotals(inspection) {
   );
 }
 
-function wasEdited(inspection) {
+function wasEdited(inspection: Inspection) {
   if (!inspection.updated_at || !inspection.created_at) return false;
-  return Math.abs(new Date(inspection.updated_at) - new Date(inspection.created_at)) > 1000;
+  return Math.abs(new Date(inspection.updated_at).getTime() - new Date(inspection.created_at).getTime()) > 1000;
 }
 
 const OperatorHistoryPage = () => {
   const { user, logout } = useAuth();
-  const [inspections, setInspections] = useState([]);
-  const [selectedInspection, setSelectedInspection] = useState(null);
-  const [editingInspection, setEditingInspection] = useState(null);
-  const [editResponses, setEditResponses] = useState({});
-  const [editObservations, setEditObservations] = useState({});
+  const [inspections, setInspections] = useState<Inspection[]>([]);
+  const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null);
+  const [editingInspection, setEditingInspection] = useState<Inspection | null>(null);
+  const [editResponses, setEditResponses] = useState<Record<string, InspectionAnswer>>({});
+  const [editObservations, setEditObservations] = useState<Record<string, string>>({});
   const [generalObservation, setGeneralObservation] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,7 +42,7 @@ const OperatorHistoryPage = () => {
     try {
       setInspections(await api.getInspections());
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -49,19 +52,19 @@ const OperatorHistoryPage = () => {
     loadInspections();
   }, []);
 
-  const openDetails = async (inspection) => {
+  const openDetails = async (inspection: Inspection) => {
     try {
       setSelectedInspection(await api.getInspection(inspection.id));
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     }
   };
 
-  const openEdit = async (inspection) => {
+  const openEdit = async (inspection: Inspection) => {
     try {
       const details = await api.getInspection(inspection.id);
-      const responses = {};
-      const observations = {};
+      const responses: Record<string, InspectionAnswer> = {};
+      const observations: Record<string, string> = {};
       (details.results || []).forEach((result) => {
         responses[result.item_id] = result.answer === 'NC' ? 'NC' : 'OK';
         observations[result.item_id] = result.observation || '';
@@ -71,7 +74,7 @@ const OperatorHistoryPage = () => {
       setEditObservations(observations);
       setGeneralObservation(details.observations || '');
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -106,7 +109,7 @@ const OperatorHistoryPage = () => {
       closeEdit();
       await loadInspections();
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -118,7 +121,7 @@ const OperatorHistoryPage = () => {
   );
 
   return (
-    <div style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100vh' }}>
+    <PageRoot>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container">
@@ -166,7 +169,7 @@ const OperatorHistoryPage = () => {
                 ))}
                 {!loading && inspections.length === 0 && (
                   <tr>
-                    <td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+                    <td colSpan={5} style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
                       Nenhum checklist criado por você.
                     </td>
                   </tr>
@@ -213,7 +216,7 @@ const OperatorHistoryPage = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="operator-details-title"
-          onPointerDown={(event) => {
+          onPointerDown={(event: React.PointerEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) setSelectedInspection(null);
           }}
         >
@@ -278,7 +281,7 @@ const OperatorHistoryPage = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="operator-edit-title"
-          onPointerDown={(event) => {
+          onPointerDown={(event: React.PointerEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) closeEdit();
           }}
         >
@@ -308,7 +311,7 @@ const OperatorHistoryPage = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                       <strong style={{ fontSize: '13px', lineHeight: 1.35, flex: '1 1 220px' }}>{result.itemDescription}</strong>
                       <div style={{ display: 'flex', gap: '6px' }}>
-                        {['OK', 'NC'].map((answer) => (
+                        {(['OK', 'NC'] as InspectionAnswer[]).map((answer) => (
                           <button
                             key={answer}
                             type="button"
@@ -345,7 +348,7 @@ const OperatorHistoryPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageRoot>
   );
 };
 

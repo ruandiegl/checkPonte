@@ -1,11 +1,33 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
-import Badge from './Badge';
-import vulcanoLogo from '../assets/vulcano-logo-transparent.png';
-import { getNavigationLinks } from '../utils/navigation';
+import Badge from '../Badge';
+import vulcanoLogo from '../../assets/vulcano-logo-transparent.png';
+import { getNavigationLinks } from '../../utils/navigation';
+import type { AppUser } from '../../types/domain';
+import {
+  Avatar,
+  BottomNav,
+  BottomNavItem,
+  BrandLink,
+  BrandLogo,
+  BrandSurface,
+  DesktopLinks,
+  LogoutButton,
+  NavbarActions,
+  NavbarItem,
+  NavbarMain,
+  NavbarRoot,
+  NavbarUser,
+  UserCopy,
+  UserName,
+} from './styles';
 
-const Navbar = ({ user, onLogout }) => {
+interface NavbarProps {
+  user?: AppUser | null;
+  onLogout: () => void;
+}
+
+const Navbar = ({ user, onLogout }: NavbarProps) => {
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const links = getNavigationLinks(user);
 
@@ -19,58 +41,58 @@ const Navbar = ({ user, onLogout }) => {
 
   return (
     <>
-      <nav className="navbar">
-        <div className="navbar-main">
-          <NavLink to="/checklist" className="navbar-brand">
-            <span className="navbar-brand-surface">
-              <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="navbar-logo" />
-            </span>
-          </NavLink>
+      <NavbarRoot>
+        <NavbarMain>
+          <BrandLink to="/checklist">
+            <BrandSurface>
+              <BrandLogo src={vulcanoLogo} alt="Metalúrgica Vulcano" />
+            </BrandSurface>
+          </BrandLink>
 
-          <div className="navbar-desktop-links">
+          <DesktopLinks>
             {links.map((link) => (
-              <NavLink
+              <NavbarItem
                 key={link.to}
                 to={link.to}
-                className={({ isActive }) => `navbar-link ${isActive ? 'is-active' : ''}`}
+                className={({ isActive }) => (isActive ? 'is-active' : '')}
               >
                 {link.label}
-              </NavLink>
+              </NavbarItem>
             ))}
-          </div>
-        </div>
+          </DesktopLinks>
+        </NavbarMain>
 
-        <div className="navbar-actions">
-          <div className="navbar-user">
-            <div className="navbar-avatar">{initials}</div>
-            <div className="navbar-user-copy">
-              <span className="navbar-user-name">{user?.name}</span>
+        <NavbarActions>
+          <NavbarUser>
+            <Avatar>{initials}</Avatar>
+            <UserCopy>
+              <UserName>{user?.name}</UserName>
               <Badge type={user?.role}>{user?.role}</Badge>
-            </div>
-          </div>
+            </UserCopy>
+          </NavbarUser>
 
-          <button type="button" onClick={() => setShowLogoutConfirm(true)} className="navbar-logout" aria-label="Sair">
+          <LogoutButton type="button" onClick={() => setShowLogoutConfirm(true)} aria-label="Sair">
             <LogOut size={18} />
-          </button>
-        </div>
-      </nav>
+          </LogoutButton>
+        </NavbarActions>
+      </NavbarRoot>
 
-      <nav className="bottom-nav" aria-label="Navegação principal">
+      <BottomNav aria-label="Navegação principal">
         {links.map((link) => {
           const Icon = link.icon;
 
           return (
-            <NavLink
+            <BottomNavItem
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `bottom-nav-item ${isActive ? 'is-active' : ''}`}
+              className={({ isActive }) => (isActive ? 'is-active' : '')}
             >
               <Icon size={21} />
               <span>{link.shortLabel}</span>
-            </NavLink>
+            </BottomNavItem>
           );
         })}
-      </nav>
+      </BottomNav>
 
       {showLogoutConfirm && (
         <div
@@ -78,7 +100,7 @@ const Navbar = ({ user, onLogout }) => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="logout-modal-title"
-          onPointerDown={(event) => {
+          onPointerDown={(event: React.PointerEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) setShowLogoutConfirm(false);
           }}
         >

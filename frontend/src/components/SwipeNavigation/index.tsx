@@ -1,21 +1,29 @@
 import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { getNavigationLinks } from '../utils/navigation';
+import { useAuth } from '../../context';
+import { getNavigationLinks } from '../../utils/navigation';
+import type { AppUser } from '../../types/domain';
 
 const ignoredSelector = 'input, textarea, select, button, a, [role="dialog"], .modal-backdrop, .responsive-table, .tabs-scroll';
 
-function shouldIgnoreSwipe(target) {
-  return Boolean(target.closest?.(ignoredSelector));
+interface TouchState {
+  x: number;
+  y: number;
+  time: number;
+  target: EventTarget | null;
+}
+
+function shouldIgnoreSwipe(target: EventTarget | null) {
+  return target instanceof Element && Boolean(target.closest(ignoredSelector));
 }
 
 const SwipeNavigation = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const touchRef = useRef(null);
+  const touchRef = useRef<TouchState | null>(null);
   const locationRef = useRef(location.pathname);
-  const userRef = useRef(user);
+  const userRef = useRef<AppUser | null>(user);
 
   useEffect(() => {
     locationRef.current = location.pathname;
@@ -23,7 +31,7 @@ const SwipeNavigation = () => {
   }, [location.pathname, user]);
 
   useEffect(() => {
-    const handleTouchStart = (event) => {
+    const handleTouchStart = (event: TouchEvent) => {
       if (!userRef.current || window.innerWidth > 760 || shouldIgnoreSwipe(event.target)) return;
       const touch = event.touches[0];
       touchRef.current = {
@@ -34,7 +42,7 @@ const SwipeNavigation = () => {
       };
     };
 
-    const handleTouchEnd = (event) => {
+    const handleTouchEnd = (event: TouchEvent) => {
       const currentTouch = touchRef.current;
       if (!currentTouch || !userRef.current || window.innerWidth > 760 || shouldIgnoreSwipe(currentTouch.target) || shouldIgnoreSwipe(event.target)) {
         touchRef.current = null;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context';
 import SwipeNavigation from './components/SwipeNavigation';
 import LoginPage from './pages/LoginPage';
 import ChecklistPage from './pages/ChecklistPage';

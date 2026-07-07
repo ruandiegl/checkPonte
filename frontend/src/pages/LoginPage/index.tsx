@@ -1,19 +1,33 @@
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import vulcanoLogo from '../assets/vulcano-logo-transparent.png';
+import { useAuth } from '../../context';
+import vulcanoLogo from '../../assets/vulcano-logo-transparent.png';
+import { getErrorMessage } from '../../types/domain';
+import {
+  BrandLogo,
+  BrandPanel,
+  Footer,
+  FormPanel,
+  LoginButton,
+  LoginCard,
+  LoginField,
+  LoginForm,
+  LoginInput,
+  LoginPageRoot,
+  SystemTitle,
+} from './styles';
 
 const LoginPage = () => {
-  const usernameRef = useRef(null);
-  const passwordRef = useRef(null);
+  const usernameRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!username.trim()) {
@@ -32,7 +46,7 @@ const LoginPage = () => {
       const loggedUser = await login(username, password);
       navigate(loggedUser.role === 'master' ? '/dashboard' : '/checklist');
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err, 'Usuário ou senha inválidos.'));
       passwordRef.current?.focus();
     } finally {
       setLoading(false);
@@ -40,51 +54,49 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-page-bg">
-      <main className="login-card-container" aria-label="Acesso ao sistema Vulcano">
-        <section className="login-brand-panel">
-          <img src={vulcanoLogo} alt="Metalúrgica Vulcano" className="login-card-logo" />
-        </section>
+    <LoginPageRoot>
+      <LoginCard aria-label="Acesso ao sistema Vulcano">
+        <BrandPanel>
+          <BrandLogo src={vulcanoLogo} alt="Metalúrgica Vulcano" />
+        </BrandPanel>
 
-        <section className="login-form-panel">
-          <p className="login-system-title">SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</p>
+        <FormPanel>
+          <SystemTitle>SISTEMA DE INSPEÇÃO DE PONTES ROLANTES</SystemTitle>
 
-          <form className="login-form" onSubmit={handleSubmit} noValidate>
-            <label className="login-field">
+          <LoginForm onSubmit={handleSubmit} noValidate>
+            <LoginField>
               <span>USUÁRIO</span>
-              <input
+              <LoginInput
                 ref={usernameRef}
                 type="text"
-                className="login-input-v3"
                 placeholder="Digite seu usuário"
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 autoComplete="username"
               />
-            </label>
+            </LoginField>
 
-            <label className="login-field">
+            <LoginField>
               <span>SENHA</span>
-              <input
+              <LoginInput
                 ref={passwordRef}
                 type="password"
-                className="login-input-v3"
                 placeholder="••••••••"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 autoComplete="current-password"
               />
-            </label>
+            </LoginField>
 
-            <button type="submit" disabled={loading} className="login-button-v3">
+            <LoginButton type="submit" disabled={loading}>
               {loading ? 'CARREGANDO...' : 'ENTRAR'}
-            </button>
-          </form>
+            </LoginButton>
+          </LoginForm>
 
-          <p className="login-footer">Vulcano Industrial © 2026</p>
-        </section>
-      </main>
-    </div>
+          <Footer>Vulcano Industrial © 2026</Footer>
+        </FormPanel>
+      </LoginCard>
+    </LoginPageRoot>
   );
 };
 

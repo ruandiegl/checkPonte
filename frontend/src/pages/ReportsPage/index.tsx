@@ -1,17 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api';
-import Navbar from '../components/Navbar';
-import Button from '../components/Button';
-import Badge from '../components/Badge';
+import { useAuth } from '../../context';
+import { api } from '../../services/api';
+import Navbar from '../../components/Navbar';
+import Button from '../../components/Button';
+import Badge from '../../components/Badge';
+import { PageRoot } from './styles';
+import type { DateRange, ExportType, Inspection, ReportData } from '../../types/domain';
+import { getErrorMessage } from '../../types/domain';
 
-function formatDate(date) {
+type ReportPreset = 'today' | 'week' | 'month' | 'custom';
+
+function formatDate(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
-function getPresetRange(preset) {
+function getPresetRange(preset: ReportPreset): DateRange {
   const to = new Date();
   const from = new Date();
   if (preset === 'week') from.setDate(to.getDate() - 6);
@@ -21,11 +26,11 @@ function getPresetRange(preset) {
 
 const ReportsPage = () => {
   const { user, logout } = useAuth();
-  const [preset, setPreset] = useState('today');
+  const [preset, setPreset] = useState<ReportPreset>('today');
   const [range, setRange] = useState(getPresetRange('today'));
-  const [report, setReport] = useState(null);
+  const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [downloading, setDownloading] = useState('');
+  const [downloading, setDownloading] = useState<ExportType | ''>('');
 
   const params = useMemo(() => ({ from: range.from, to: range.to }), [range]);
 
@@ -34,7 +39,7 @@ const ReportsPage = () => {
     try {
       setReport(await api.getReport(params));
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -44,24 +49,24 @@ const ReportsPage = () => {
     loadReport();
   }, [loadReport]);
 
-  const handlePreset = (nextPreset) => {
+  const handlePreset = (nextPreset: ReportPreset) => {
     setPreset(nextPreset);
     if (nextPreset !== 'custom') setRange(getPresetRange(nextPreset));
   };
 
-  const handleDownload = async (type) => {
+  const handleDownload = async (type: ExportType) => {
     setDownloading(type);
     try {
       if (type === 'pdf') await api.downloadReportPdf(params);
       if (type === 'excel') await api.downloadReportExcel(params);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setDownloading('');
     }
   };
 
-  const presets = [
+  const presets: Array<{ id: ReportPreset; label: string }> = [
     { id: 'today', label: 'Hoje' },
     { id: 'week', label: 'Semana' },
     { id: 'month', label: 'Mês' },
@@ -69,7 +74,7 @@ const ReportsPage = () => {
   ];
 
   return (
-    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
+    <PageRoot>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container">
@@ -167,7 +172,7 @@ const ReportsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {(report?.inspections || []).map((inspection) => (
+                {(report?.inspections || []).map((inspection: Inspection) => (
                   <tr key={inspection.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
                     <td style={{ padding: '12px', fontSize: '13px' }}>{new Date(inspection.created_at).toLocaleString('pt-BR')}</td>
                     <td style={{ padding: '12px', fontSize: '13px' }}>{inspection.equipmentName}</td>
@@ -177,7 +182,7 @@ const ReportsPage = () => {
                 ))}
                 {(report?.inspections || []).length === 0 && (
                   <tr>
-                    <td colSpan="4" style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+                    <td colSpan={4} style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
                       Nenhuma inspeção encontrada no período.
                     </td>
                   </tr>
@@ -187,7 +192,7 @@ const ReportsPage = () => {
           </div>
 
           <div className="mobile-record-list">
-            {(report?.inspections || []).map((inspection) => (
+            {(report?.inspections || []).map((inspection: Inspection) => (
               <article key={inspection.id} className="mobile-record-card">
                 <div className="mobile-record-top">
                   <div>
@@ -217,7 +222,7 @@ const ReportsPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageRoot>
   );
 };
 

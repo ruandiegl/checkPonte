@@ -1,21 +1,24 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api';
-import Navbar from '../components/Navbar';
-import Button from '../components/Button';
-import Banner from '../components/Banner';
-import Badge from '../components/Badge';
+import { useAuth } from '../../context';
+import { api } from '../../services/api';
+import Navbar from '../../components/Navbar';
+import Button from '../../components/Button';
+import Banner from '../../components/Banner';
+import Badge from '../../components/Badge';
+import { PageRoot } from './styles';
+import type { CheckItem, EntityId, Equipment, InspectionAnswer } from '../../types/domain';
+import { getErrorMessage } from '../../types/domain';
 
 const ChecklistPage = () => {
   const { user, logout } = useAuth();
-  const equipmentSectionRef = useRef(null);
-  const equipmentSelectRef = useRef(null);
-  const [equipment, setEquipment] = useState([]);
-  const [items, setItems] = useState([]);
+  const equipmentSectionRef = useRef<HTMLDivElement | null>(null);
+  const equipmentSelectRef = useRef<HTMLSelectElement | null>(null);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [items, setItems] = useState<CheckItem[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState('');
-  const [responses, setResponses] = useState({});
-  const [observations, setObservations] = useState({});
+  const [responses, setResponses] = useState<Record<string, InspectionAnswer>>({});
+  const [observations, setObservations] = useState<Record<string, string>>({});
   const [showImperativeAlert, setShowImperativeAlert] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -30,14 +33,14 @@ const ChecklistPage = () => {
         setEquipment(equipmentData.filter(e => e.active));
         setItems(itemData.filter(i => i.active));
       } catch (err) {
-        toast.error(err.message);
+        toast.error(getErrorMessage(err));
       }
     };
 
     loadChecklistData();
   }, []);
 
-  const handleResponseChange = (itemId, status) => {
+  const handleResponseChange = (itemId: EntityId, status: InspectionAnswer) => {
     const newResponses = { ...responses, [itemId]: status };
     setResponses(newResponses);
 
@@ -48,11 +51,11 @@ const ChecklistPage = () => {
     setShowImperativeAlert(hasImperativeNC);
   };
 
-  const handleObservationChange = (itemId, value) => {
+  const handleObservationChange = (itemId: EntityId, value: string) => {
     setObservations({ ...observations, [itemId]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedEquipment) {
       toast.warning('Selecione um equipamento para continuar.');
@@ -97,7 +100,7 @@ const ChecklistPage = () => {
       toast.success('Checklist enviado com sucesso.');
       setSubmitted(true);
     } catch (err) {
-      toast.error(err.message || 'Erro ao salvar inspeção.');
+      toast.error(getErrorMessage(err, 'Erro ao salvar inspeção.'));
     } finally {
       setLoading(false);
     }
@@ -113,7 +116,7 @@ const ChecklistPage = () => {
 
   if (submitted) {
     return (
-      <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
+      <PageRoot>
         <Navbar user={user} onLogout={logout} />
         <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>
           <div className="card" style={{ maxWidth: '500px', margin: '0 auto' }}>
@@ -125,12 +128,12 @@ const ChecklistPage = () => {
             <Button onClick={resetChecklist} fullWidth>Nova Inspeção</Button>
           </div>
         </div>
-      </div>
+      </PageRoot>
     );
   }
 
   return (
-    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
+    <PageRoot>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container">
@@ -251,7 +254,7 @@ const ChecklistPage = () => {
           </form>
         </div>
       </div>
-    </div>
+    </PageRoot>
   );
 };
 

@@ -1,31 +1,36 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api';
-import Navbar from '../components/Navbar';
-import Badge from '../components/Badge';
+import { useAuth } from '../../context';
+import { api } from '../../services/api';
+import Navbar from '../../components/Navbar';
+import Badge from '../../components/Badge';
+import { PageRoot } from './styles';
+import type { DashboardCraneItem, DashboardSummary, DashboardTopItem, Inspection } from '../../types/domain';
+import { getErrorMessage } from '../../types/domain';
 
-const compactText = {
+const compactText: React.CSSProperties = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 };
 
-const periodOptions = [
+const periodOptions: Array<{ id: DashboardPeriod; label: string }> = [
   { id: 'today', label: 'Hoje' },
   { id: 'week', label: 'Semana' },
   { id: 'month', label: 'Mês' },
   { id: 'all', label: 'Sempre' },
 ];
 
-function formatDate(date) {
+type DashboardPeriod = 'today' | 'week' | 'month' | 'all';
+
+function formatDate(date: Date) {
   const month = `${date.getMonth() + 1}`.padStart(2, '0');
   const day = `${date.getDate()}`.padStart(2, '0');
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
-function getDashboardParams(period) {
+function getDashboardParams(period: DashboardPeriod) {
   if (period === 'all') return {};
 
   const to = new Date();
@@ -38,11 +43,11 @@ function getDashboardParams(period) {
 
 const DashboardPage = () => {
   const { user, logout } = useAuth();
-  const [period, setPeriod] = useState('today');
-  const [stats, setStats] = useState({ total: 0, ok: 0, nc: 0, imp: 0, conformity: 0 });
-  const [byCrane, setByCrane] = useState([]);
-  const [topItems, setTopItems] = useState([]);
-  const [recentInspections, setRecentInspections] = useState([]);
+  const [period, setPeriod] = useState<DashboardPeriod>('today');
+  const [stats, setStats] = useState<DashboardSummary>({ total: 0, ok: 0, nc: 0, imp: 0, conformity: 0 });
+  const [byCrane, setByCrane] = useState<DashboardCraneItem[]>([]);
+  const [topItems, setTopItems] = useState<DashboardTopItem[]>([]);
+  const [recentInspections, setRecentInspections] = useState<Inspection[]>([]);
   const [loading, setLoading] = useState(true);
   const params = useMemo(() => getDashboardParams(period), [period]);
 
@@ -62,7 +67,7 @@ const DashboardPage = () => {
         setTopItems(itemData);
         setRecentInspections(recent);
       } catch (err) {
-        toast.error(err.message);
+        toast.error(getErrorMessage(err));
       } finally {
         setLoading(false);
       }
@@ -81,7 +86,7 @@ const DashboardPage = () => {
     { label: 'Impeditivos', value: stats.imp, color: 'var(--color-danger)' },
   ];
 
-  const inspectionTotals = (inspection) => {
+  const inspectionTotals = (inspection: Inspection) => {
     const results = inspection.results || [];
     return results.reduce(
       (acc, result) => {
@@ -94,7 +99,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
+    <PageRoot>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container" style={{ maxWidth: '660px', paddingTop: '18px' }}>
@@ -236,7 +241,7 @@ const DashboardPage = () => {
                 })}
                 {!loading && recentInspections.length === 0 && (
                   <tr>
-                    <td colSpan="6" style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+                    <td colSpan={6} style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
                       Nenhuma inspeção registrada.
                     </td>
                   </tr>
@@ -284,7 +289,7 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageRoot>
   );
 };
 

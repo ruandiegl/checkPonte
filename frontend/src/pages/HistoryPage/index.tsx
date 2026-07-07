@@ -1,19 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FileSpreadsheet, FileText, Search, X } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api';
-import Navbar from '../components/Navbar';
-import Badge from '../components/Badge';
-import Button from '../components/Button';
+import { useAuth } from '../../context';
+import { api } from '../../services/api';
+import Navbar from '../../components/Navbar';
+import Badge from '../../components/Badge';
+import Button from '../../components/Button';
+import { PageRoot } from './styles';
+import type { ExportType, Inspection } from '../../types/domain';
+import { getErrorMessage } from '../../types/domain';
 
-function formatDate(date) {
+function formatDate(date: Date) {
   const month = `${date.getMonth() + 1}`.padStart(2, '0');
   const day = `${date.getDate()}`.padStart(2, '0');
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
-function inspectionTotals(inspection) {
+function inspectionTotals(inspection: Inspection) {
   const results = inspection.results || [];
   return results.reduce(
     (acc, result) => {
@@ -27,10 +30,10 @@ function inspectionTotals(inspection) {
 
 const HistoryPage = () => {
   const { user, logout } = useAuth();
-  const [inspections, setInspections] = useState([]);
+  const [inspections, setInspections] = useState<Inspection[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInspection, setSelectedInspection] = useState(null);
-  const [downloading, setDownloading] = useState('');
+  const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null);
+  const [downloading, setDownloading] = useState<ExportType | ''>('');
   const hasExportableInspections = inspections.length > 0;
 
   useEffect(() => {
@@ -38,7 +41,7 @@ const HistoryPage = () => {
       try {
         setInspections(await api.getInspections());
       } catch (err) {
-        toast.error(err.message);
+        toast.error(getErrorMessage(err));
       }
     };
 
@@ -60,34 +63,34 @@ const HistoryPage = () => {
     const dates = source
       .map((inspection) => new Date(inspection.created_at))
       .filter((date) => !Number.isNaN(date.getTime()))
-      .sort((a, b) => a - b);
+      .sort((a, b) => a.getTime() - b.getTime());
 
     if (dates.length === 0) return {};
     return { from: formatDate(dates[0]), to: formatDate(dates[dates.length - 1]) };
   }, [filteredInspections, inspections]);
 
-  const handleDownload = async (type) => {
+  const handleDownload = async (type: ExportType) => {
     setDownloading(type);
     try {
       if (type === 'pdf') await api.downloadReportPdf(exportParams);
       if (type === 'excel') await api.downloadReportExcel(exportParams);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setDownloading('');
     }
   };
 
-  const openDetails = async (inspection) => {
+  const openDetails = async (inspection: Inspection) => {
     try {
       setSelectedInspection(await api.getInspection(inspection.id));
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     }
   };
 
   return (
-    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
+    <PageRoot>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container">
@@ -160,7 +163,7 @@ const HistoryPage = () => {
                 ))}
                 {filteredInspections.length === 0 && (
                   <tr>
-                    <td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+                    <td colSpan={5} style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
                       Nenhuma inspeção encontrada.
                     </td>
                   </tr>
@@ -216,7 +219,7 @@ const HistoryPage = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="inspection-modal-title"
-          onPointerDown={(event) => {
+          onPointerDown={(event: React.PointerEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) setSelectedInspection(null);
           }}
         >
@@ -266,7 +269,7 @@ const HistoryPage = () => {
                 <div className="detail-field">
                   <span className="detail-label">Última edição</span>
                   <span className="detail-value">
-                    {selectedInspection.updated_at && Math.abs(new Date(selectedInspection.updated_at) - new Date(selectedInspection.created_at)) > 1000
+                    {selectedInspection.updated_at && Math.abs(new Date(selectedInspection.updated_at).getTime() - new Date(selectedInspection.created_at).getTime()) > 1000
                       ? new Date(selectedInspection.updated_at).toLocaleString('pt-BR')
                       : 'Sem edição'}
                   </span>
@@ -357,7 +360,7 @@ const HistoryPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageRoot>
   );
 };
 

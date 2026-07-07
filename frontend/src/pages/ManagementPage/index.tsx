@@ -1,11 +1,25 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ClipboardList, Eye, Pencil, Plus, Power, PowerOff, Settings, Trash2, Users, X } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api';
-import Navbar from '../components/Navbar';
-import Button from '../components/Button';
-import Badge from '../components/Badge';
+import { useAuth } from '../../context';
+import { api } from '../../services/api';
+import Navbar from '../../components/Navbar';
+import Button from '../../components/Button';
+import Badge from '../../components/Badge';
+import { PageRoot } from './styles';
+import { getErrorMessage } from '../../types/domain';
+
+type ManagementTab = 'users' | 'equipment' | 'items';
+type ModalMode = 'view' | 'edit' | 'create' | null;
+type ManagedRecord = Record<string, any>;
+type ManagementForm = Record<string, any>;
+type ConfirmAction = {
+  type: 'toggleUser' | 'deleteEquipment' | 'deleteItem';
+  item: ManagedRecord;
+  title: string;
+  message: string;
+  confirmLabel: string;
+} | null;
 
 const emptyForms = {
   users: { name: '', login: '', email: '', role: 'operator', password: '', active: true },
@@ -13,7 +27,7 @@ const emptyForms = {
   items: { description: '', is_imperative: false, order_index: 0, active: true },
 };
 
-const tabLabels = {
+const tabLabels: Record<ManagementTab, string> = {
   users: 'usuário',
   equipment: 'equipamento',
   items: 'item',
@@ -21,12 +35,12 @@ const tabLabels = {
 
 const ManagementPage = () => {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('users');
-  const [data, setData] = useState([]);
-  const [modalMode, setModalMode] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [confirmAction, setConfirmAction] = useState(null);
-  const [form, setForm] = useState(emptyForms.users);
+  const [activeTab, setActiveTab] = useState<ManagementTab>('users');
+  const [data, setData] = useState<ManagedRecord[]>([]);
+  const [modalMode, setModalMode] = useState<ModalMode>(null);
+  const [selectedItem, setSelectedItem] = useState<ManagedRecord | null>(null);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const [form, setForm] = useState<ManagementForm>(emptyForms.users);
   const [saving, setSaving] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -35,7 +49,7 @@ const ManagementPage = () => {
       else if (activeTab === 'equipment') setData(await api.getEquipment());
       else if (activeTab === 'items') setData(await api.getAllItems());
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     }
   }, [activeTab]);
 
@@ -46,7 +60,7 @@ const ManagementPage = () => {
     setForm(emptyForms[activeTab]);
   }, [activeTab, loadData]);
 
-  const tabs = [
+  const tabs: Array<{ id: ManagementTab; label: string; icon: React.ReactNode }> = [
     { id: 'users', label: 'Usuários', icon: <Users size={16} /> },
     { id: 'equipment', label: 'Equipamentos', icon: <Settings size={16} /> },
     { id: 'items', label: 'Itens de verificação', icon: <ClipboardList size={16} /> },
@@ -60,12 +74,12 @@ const ManagementPage = () => {
     return '';
   }, [activeTab, modalMode]);
 
-  const getItemTitle = (item) => {
+  const getItemTitle = (item: ManagedRecord) => {
     if (activeTab === 'users') return item.name;
     return item.name || item.description;
   };
 
-  const getItemSubtitle = (item) => {
+  const getItemSubtitle = (item: ManagedRecord) => {
     if (activeTab === 'users') return item.username || item.login;
     if (activeTab === 'equipment') return item.location || item.description || 'Sem local informado';
     return item.is_imperative ? 'Item impeditivo' : 'Item não impeditivo';
@@ -77,12 +91,12 @@ const ManagementPage = () => {
     setModalMode('create');
   };
 
-  const openView = (item) => {
+  const openView = (item: ManagedRecord) => {
     setSelectedItem(item);
     setModalMode('view');
   };
 
-  const openEdit = (item) => {
+  const openEdit = (item: ManagedRecord) => {
     setSelectedItem(item);
     if (activeTab === 'users') {
       setForm({
@@ -121,7 +135,7 @@ const ManagementPage = () => {
     setSaving(false);
   };
 
-  const updateForm = (field, value) => {
+  const updateForm = (field: string, value: any) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
@@ -157,7 +171,7 @@ const ManagementPage = () => {
     };
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSaving(true);
 
@@ -179,12 +193,12 @@ const ManagementPage = () => {
       closeModal();
       toast.success(modalMode === 'create' ? 'Registro criado com sucesso.' : 'Registro atualizado com sucesso.');
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
       setSaving(false);
     }
   };
 
-  const openConfirmAction = (item) => {
+  const openConfirmAction = (item: ManagedRecord) => {
     if (activeTab === 'users') {
       setConfirmAction({
         type: 'toggleUser',
@@ -235,7 +249,7 @@ const ManagementPage = () => {
       setConfirmAction(null);
       await loadData();
     } catch (err) {
-      toast.error(err.message);
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -351,7 +365,7 @@ const ManagementPage = () => {
 
     return (
       <div className="detail-grid">
-        {fields.map(([label, value]) => (
+            {fields.map(([label, value]: [string, any]) => (
           <div key={label} className={label === 'Descrição' ? 'form-field is-full' : 'form-field'}>
             <span className="detail-label">{label}</span>
             <div className="detail-value">{value}</div>
@@ -361,7 +375,7 @@ const ManagementPage = () => {
     );
   };
 
-  const renderActions = (item) => (
+  const renderActions = (item: ManagedRecord) => (
     <div className="action-group">
       <button type="button" className="icon-action" onClick={() => openView(item)} title="Visualizar" aria-label="Visualizar">
         <Eye size={16} />
@@ -382,7 +396,7 @@ const ManagementPage = () => {
   );
 
   return (
-    <div className="has-bottom-nav" style={{ backgroundColor: 'var(--color-bg-primary)', minHeight: '100dvh' }}>
+    <PageRoot>
       <Navbar user={user} onLogout={logout} />
 
       <div className="container">
@@ -497,7 +511,7 @@ const ManagementPage = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="management-modal-title"
-          onPointerDown={(event) => {
+          onPointerDown={(event: React.PointerEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) closeModal();
           }}
         >
@@ -518,7 +532,7 @@ const ManagementPage = () => {
               <div className="modal-footer">
                 {modalMode === 'view' ? (
                   <>
-                    <Button type="button" variant="secondary" onClick={() => openEdit(selectedItem)}>Editar</Button>
+                    <Button type="button" variant="secondary" onClick={() => selectedItem && openEdit(selectedItem)}>Editar</Button>
                     <Button type="button" onClick={closeModal}>Fechar</Button>
                   </>
                 ) : (
@@ -539,7 +553,7 @@ const ManagementPage = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-modal-title"
-          onPointerDown={(event) => {
+          onPointerDown={(event: React.PointerEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) setConfirmAction(null);
           }}
         >
@@ -575,7 +589,7 @@ const ManagementPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageRoot>
   );
 };
 
