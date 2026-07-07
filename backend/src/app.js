@@ -9,9 +9,24 @@ import { routes } from './routes/index.js';
 
 export const app = express();
 
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    const isAllowedOrigin = env.corsOrigins.includes(origin);
+    const isProjectPreview = /^https:\/\/check-ponte(?:-frontend)?-[a-z0-9-]+\.vercel\.app$/i.test(origin);
+
+    callback(null, isAllowedOrigin || isProjectPreview);
+  },
+  credentials: true,
+};
+
 app.set('trust proxy', 1);
 app.use(helmet());
-app.use(cors({ origin: env.corsOrigin, credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
 
 app.use(
