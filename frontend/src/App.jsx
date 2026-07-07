@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider, useAuth } from './context';
 import SwipeNavigation from './components/SwipeNavigation';
-import LoginPage from './pages/LoginPage';
-import ChecklistPage from './pages/ChecklistPage';
-import DashboardPage from './pages/DashboardPage';
-import HistoryPage from './pages/HistoryPage';
-import OperatorHistoryPage from './pages/OperatorHistoryPage';
-import ManagementPage from './pages/ManagementPage';
-import ReportsPage from './pages/ReportsPage';
+import LoginPage from './pages/LoginPage/index';
+import ChecklistPage from './pages/ChecklistPage/index';
+import DashboardPage from './pages/DashboardPage/index';
+import HistoryPage from './pages/HistoryPage/index';
+import OperatorHistoryPage from './pages/OperatorHistoryPage/index';
+import ManagementPage from './pages/ManagementPage/index';
+import ReportsPage from './pages/ReportsPage/index';
 
 const PrivateRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
