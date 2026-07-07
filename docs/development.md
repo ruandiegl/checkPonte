@@ -10,6 +10,12 @@
 
 O PostgreSQL local fica em Docker Compose.
 
+Antes de subir o container, copie o exemplo da raiz e defina uma senha local:
+
+```bash
+copy .env.example .env
+```
+
 ```bash
 docker compose up -d postgres
 ```
@@ -19,7 +25,7 @@ Configuração atual:
 - container: `vulcano-postgres`
 - banco: `vulcano_checklist`
 - usuário: `postgres`
-- senha: `postgres`
+- senha: definida em `POSTGRES_PASSWORD`
 - porta local: `5434`
 
 ## Backend

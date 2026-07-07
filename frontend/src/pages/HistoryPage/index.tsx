@@ -1,20 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { FileSpreadsheet, FileText, Search, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context';
 import { api } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Badge from '../../components/Badge';
 import Button from '../../components/Button';
+import Input from '../../components/ui/Input';
 import { PageRoot } from './styles';
-import type { ExportType, Inspection } from '../../types/domain';
+import type { Inspection } from '../../types/domain';
 import { getErrorMessage } from '../../types/domain';
-
-function formatDate(date: Date) {
-  const month = `${date.getMonth() + 1}`.padStart(2, '0');
-  const day = `${date.getDate()}`.padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-}
 
 function inspectionTotals(inspection: Inspection) {
   const results = inspection.results || [];
@@ -33,8 +28,6 @@ const HistoryPage = () => {
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null);
-  const [downloading, setDownloading] = useState<ExportType | ''>('');
-  const hasExportableInspections = inspections.length > 0;
 
   useEffect(() => {
     const loadInspections = async () => {
@@ -56,31 +49,6 @@ const HistoryPage = () => {
 
   const selectedTotals = selectedInspection ? inspectionTotals(selectedInspection) : { c: 0, nc: 0 };
 
-  const exportParams = useMemo(() => {
-    const source = filteredInspections.length > 0 ? filteredInspections : inspections;
-    if (source.length === 0) return {};
-
-    const dates = source
-      .map((inspection) => new Date(inspection.created_at))
-      .filter((date) => !Number.isNaN(date.getTime()))
-      .sort((a, b) => a.getTime() - b.getTime());
-
-    if (dates.length === 0) return {};
-    return { from: formatDate(dates[0]), to: formatDate(dates[dates.length - 1]) };
-  }, [filteredInspections, inspections]);
-
-  const handleDownload = async (type: ExportType) => {
-    setDownloading(type);
-    try {
-      if (type === 'pdf') await api.downloadReportPdf(exportParams);
-      if (type === 'excel') await api.downloadReportExcel(exportParams);
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setDownloading('');
-    }
-  };
-
   const openDetails = async (inspection: Inspection) => {
     try {
       setSelectedInspection(await api.getInspection(inspection.id));
@@ -96,33 +64,11 @@ const HistoryPage = () => {
       <div className="container">
         <div className="page-header">
           <h1>Histórico de inspeções</h1>
-          <div className="page-actions">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => handleDownload('pdf')}
-              loading={downloading === 'pdf'}
-              disabled={!hasExportableInspections}
-              style={{ alignItems: 'center', gap: '8px', border: '1px solid var(--color-border)' }}
-            >
-              <FileText size={16} /> PDF
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => handleDownload('excel')}
-              loading={downloading === 'excel'}
-              disabled={!hasExportableInspections}
-              style={{ alignItems: 'center', gap: '8px', border: '1px solid var(--color-border)' }}
-            >
-              <FileSpreadsheet size={16} /> Excel
-            </Button>
-          </div>
         </div>
 
         <div className="card search-card" style={{ marginBottom: '20px', padding: '10px 15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Search size={18} color="var(--color-text-secondary)" />
-          <input
+          <Input
             type="text"
             placeholder="Buscar por equipamento, operador ou status..."
             value={searchTerm}

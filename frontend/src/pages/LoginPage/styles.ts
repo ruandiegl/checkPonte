@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { InputRoot } from '../../components/ui/Input/styles';
 
 export const LoginPageRoot = styled.div`
   min-height: 100dvh;
@@ -106,7 +107,7 @@ export const LoginField = styled.label`
   }
 `;
 
-export const LoginInput = styled.input`
+export const LoginInput = styled(InputRoot)`
   width: 100%;
   min-height: 46px;
   padding: 12px 15px;

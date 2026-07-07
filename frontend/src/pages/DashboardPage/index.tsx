@@ -5,6 +5,7 @@ import { useAuth } from '../../context';
 import { api } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Badge from '../../components/Badge';
+import { HorizontalBarChart, type ChartDatum } from '../../components/ui/Chart';
 import { PageRoot } from './styles';
 import type { DashboardCraneItem, DashboardSummary, DashboardTopItem, Inspection } from '../../types/domain';
 import { getErrorMessage } from '../../types/domain';
@@ -76,8 +77,28 @@ const DashboardPage = () => {
     loadDashboard();
   }, [params]);
 
-  const maxCraneNc = useMemo(() => Math.max(1, ...byCrane.map((item) => item.ncCount || 0)), [byCrane]);
-  const maxItemNc = useMemo(() => Math.max(1, ...topItems.map((item) => item.ncCount || 0)), [topItems]);
+  const craneChartData = useMemo<ChartDatum[]>(
+    () => byCrane.map((item) => {
+      const value = item.ncCount || 0;
+      return {
+        id: item.equipment_id,
+        label: item.equipmentName,
+        value,
+        color: value > 0 ? '#ff6370' : 'var(--color-success)',
+      };
+    }),
+    [byCrane],
+  );
+
+  const topItemChartData = useMemo<ChartDatum[]>(
+    () => topItems.map((item) => ({
+      id: item.item_id,
+      label: item.description,
+      value: item.ncCount || 0,
+      color: '#ff6370',
+    })),
+    [topItems],
+  );
 
   const metricCards = [
     { label: 'Total', value: stats.total, color: 'var(--color-text-primary)' },
@@ -149,59 +170,20 @@ const DashboardPage = () => {
           ))}
         </div>
 
-        <div className="card" style={{ padding: '16px', marginBottom: '14px' }}>
-          <label className="section-label">Por ponte rolante</label>
-          <div style={{ display: 'grid', gap: '10px' }}>
-            {byCrane.map((item) => {
-              const value = item.ncCount || 0;
-              const width = `${Math.max(value === 0 ? 0 : 8, (value / maxCraneNc) * 100)}%`;
+        <div style={{ display: 'grid', gap: '14px', marginBottom: '14px' }}>
+          <HorizontalBarChart
+            title="Por ponte rolante"
+            data={loading ? [] : craneChartData}
+            emptyMessage="Nenhuma ponte cadastrada."
+            valueLabel="NC"
+          />
 
-              return (
-                <div key={item.equipment_id} style={{ display: 'grid', gridTemplateColumns: '95px 1fr 28px', gap: '12px', alignItems: 'center' }}>
-                  <span title={item.equipmentName} style={{ ...compactText, fontSize: '12px' }}>{item.equipmentName}</span>
-                  <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'var(--color-bg-header)', overflow: 'hidden' }}>
-                    <div
-                      style={{
-                        width,
-                        height: '100%',
-                        borderRadius: '999px',
-                        backgroundColor: value > 0 ? '#ff6370' : 'transparent',
-                      }}
-                    />
-                  </div>
-                  <strong style={{ color: value > 0 ? '#ff6370' : 'var(--color-success)', fontSize: '12px', textAlign: 'right' }}>{value}</strong>
-                </div>
-              );
-            })}
-            {!loading && byCrane.length === 0 && (
-              <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>Nenhuma ponte cadastrada.</p>
-            )}
-          </div>
-        </div>
-
-        <div className="card" style={{ padding: '16px', marginBottom: '14px' }}>
-          <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <TrendingUp size={13} color="#ff6370" /> Mais não conformes
-          </label>
-          <div style={{ display: 'grid', gap: '12px' }}>
-            {topItems.map((item) => {
-              const value = item.ncCount || 0;
-              const width = `${Math.max(8, (value / maxItemNc) * 100)}%`;
-
-              return (
-                <div key={item.item_id} style={{ display: 'grid', gridTemplateColumns: '95px 1fr 28px', gap: '12px', alignItems: 'center' }}>
-                  <span title={item.description} style={{ ...compactText, fontSize: '12px' }}>{item.description}</span>
-                  <div style={{ height: '7px', borderRadius: '999px', backgroundColor: 'var(--color-bg-header)', overflow: 'hidden' }}>
-                    <div style={{ width, height: '100%', borderRadius: '999px', backgroundColor: '#ff6370' }} />
-                  </div>
-                  <strong style={{ color: '#ff6370', fontSize: '12px', textAlign: 'right' }}>{value}</strong>
-                </div>
-              );
-            })}
-            {!loading && topItems.length === 0 && (
-              <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>Nenhuma não conformidade registrada.</p>
-            )}
-          </div>
+          <HorizontalBarChart
+            title={<><TrendingUp size={13} color="#ff6370" /> Mais nao conformes</>}
+            data={loading ? [] : topItemChartData}
+            emptyMessage="Nenhuma nao conformidade registrada."
+            valueLabel="Ocorrencias"
+          />
         </div>
 
         <div className="card" style={{ padding: '16px' }}>

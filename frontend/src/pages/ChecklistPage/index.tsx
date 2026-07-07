@@ -6,6 +6,7 @@ import Navbar from '../../components/Navbar';
 import Button from '../../components/Button';
 import Banner from '../../components/Banner';
 import Badge from '../../components/Badge';
+import Select from '../../components/ui/Select';
 import { PageRoot } from './styles';
 import type { CheckItem, EntityId, Equipment, InspectionAnswer } from '../../types/domain';
 import { getErrorMessage } from '../../types/domain';
@@ -13,7 +14,7 @@ import { getErrorMessage } from '../../types/domain';
 const ChecklistPage = () => {
   const { user, logout } = useAuth();
   const equipmentSectionRef = useRef<HTMLDivElement | null>(null);
-  const equipmentSelectRef = useRef<HTMLSelectElement | null>(null);
+  const equipmentSelectRef = useRef<HTMLButtonElement | null>(null);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [items, setItems] = useState<CheckItem[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState('');
@@ -150,17 +151,17 @@ const ChecklistPage = () => {
               <label className="section-label">Dados da Inspeção</label>
               <div style={{ marginTop: '15px' }}>
                 <label style={{ fontSize: '13px', display: 'block', marginBottom: '5px' }}>Equipamento</label>
-                <select
+                <Select
                   ref={equipmentSelectRef}
                   value={selectedEquipment}
-                  onChange={(e) => setSelectedEquipment(e.target.value)}
-                  required
-                >
-                  <option value="">Selecione o equipamento...</option>
-                  {equipment.map(e => (
-                    <option key={e.id} value={e.id}>{e.name} - {e.description}</option>
-                  ))}
-                </select>
+                  onValueChange={setSelectedEquipment}
+                  placeholder="Selecione o equipamento..."
+                  aria-label="Equipamento"
+                  options={equipment.map((item) => ({
+                    value: String(item.id),
+                    label: `${item.name}${item.description ? ` - ${item.description}` : ''}`,
+                  }))}
+                />
               </div>
             </div>
 

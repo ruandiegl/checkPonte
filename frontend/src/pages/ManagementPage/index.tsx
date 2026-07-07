@@ -6,6 +6,9 @@ import { api } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Button from '../../components/Button';
 import Badge from '../../components/Badge';
+import Checkbox from '../../components/ui/Checkbox';
+import Input from '../../components/ui/Input';
+import Select from '../../components/ui/Select';
 import { PageRoot } from './styles';
 import { getErrorMessage } from '../../types/domain';
 
@@ -261,26 +264,31 @@ const ManagementPage = () => {
         <div className="form-grid">
           <div className="form-field is-full">
             <label>Nome completo</label>
-            <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} required />
+            <Input value={form.name} onChange={(event) => updateForm('name', event.target.value)} required />
           </div>
           <div className="form-field">
             <label>Login</label>
-            <input value={form.login} onChange={(event) => updateForm('login', event.target.value)} required />
+            <Input value={form.login} onChange={(event) => updateForm('login', event.target.value)} required />
           </div>
           <div className="form-field">
             <label>E-mail</label>
-            <input type="email" value={form.email} onChange={(event) => updateForm('email', event.target.value)} />
+            <Input type="email" value={form.email} onChange={(event) => updateForm('email', event.target.value)} />
           </div>
           <div className="form-field">
             <label>Perfil</label>
-            <select value={form.role} onChange={(event) => updateForm('role', event.target.value)}>
-              <option value="master">Master</option>
-              <option value="operator">Operador</option>
-            </select>
+            <Select
+              value={form.role}
+              onValueChange={(value) => updateForm('role', value)}
+              aria-label="Perfil"
+              options={[
+                { value: 'master', label: 'Master' },
+                { value: 'operator', label: 'Operador' },
+              ]}
+            />
           </div>
           <div className="form-field">
             <label>{modalMode === 'create' ? 'Senha' : 'Nova senha'}</label>
-            <input
+            <Input
               type="password"
               value={form.password}
               onChange={(event) => updateForm('password', event.target.value)}
@@ -291,7 +299,11 @@ const ManagementPage = () => {
           </div>
           <div className="form-field is-full">
             <label className="toggle-row">
-              <input type="checkbox" checked={form.active} onChange={(event) => updateForm('active', event.target.checked)} />
+              <Checkbox
+                checked={Boolean(form.active)}
+                onCheckedChange={(checked) => updateForm('active', checked === true)}
+                aria-label="Marcar usuário como ativo"
+              />
               Usuário ativo
             </label>
           </div>
@@ -304,15 +316,15 @@ const ManagementPage = () => {
         <div className="form-grid">
           <div className="form-field is-full">
             <label>Nome</label>
-            <input value={form.name} onChange={(event) => updateForm('name', event.target.value)} required />
+            <Input value={form.name} onChange={(event) => updateForm('name', event.target.value)} required />
           </div>
           <div className="form-field">
             <label>Descrição</label>
-            <input value={form.description} onChange={(event) => updateForm('description', event.target.value)} />
+            <Input value={form.description} onChange={(event) => updateForm('description', event.target.value)} />
           </div>
           <div className="form-field">
             <label>Local</label>
-            <input value={form.location} onChange={(event) => updateForm('location', event.target.value)} />
+            <Input value={form.location} onChange={(event) => updateForm('location', event.target.value)} />
           </div>
         </div>
       );
@@ -326,11 +338,15 @@ const ManagementPage = () => {
         </div>
         <div className="form-field">
           <label>Ordem</label>
-          <input type="number" value={form.order_index} onChange={(event) => updateForm('order_index', event.target.value)} min="0" />
+          <Input type="number" value={form.order_index} onChange={(event) => updateForm('order_index', event.target.value)} min="0" />
         </div>
         <div className="form-field">
           <label className="toggle-row">
-            <input type="checkbox" checked={form.is_imperative} onChange={(event) => updateForm('is_imperative', event.target.checked)} />
+            <Checkbox
+              checked={Boolean(form.is_imperative)}
+              onCheckedChange={(checked) => updateForm('is_imperative', checked === true)}
+              aria-label="Marcar item como impeditivo"
+            />
             Impeditivo
           </label>
         </div>

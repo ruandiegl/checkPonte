@@ -6,6 +6,7 @@ import { api } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Badge from '../../components/Badge';
 import Button from '../../components/Button';
+import Empty from '../../components/ui/Empty';
 import { PageRoot } from './styles';
 import type { Inspection, InspectionAnswer } from '../../types/domain';
 import { getErrorMessage } from '../../types/domain';
@@ -169,8 +170,11 @@ const OperatorHistoryPage = () => {
                 ))}
                 {!loading && inspections.length === 0 && (
                   <tr>
-                    <td colSpan={5} style={{ padding: '30px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-                      Nenhum checklist criado por você.
+                    <td colSpan={5}>
+                      <Empty
+                        title="Nenhum checklist encontrado"
+                        description="Quando voce finalizar uma inspecao, ela aparecera aqui com datas de criacao e edicao."
+                      />
                     </td>
                   </tr>
                 )}
@@ -202,9 +206,10 @@ const OperatorHistoryPage = () => {
               </article>
             ))}
             {!loading && inspections.length === 0 && (
-              <p style={{ padding: '20px 0', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '13px' }}>
-                Nenhum checklist criado por você.
-              </p>
+              <Empty
+                title="Nenhum checklist encontrado"
+                description="Quando voce finalizar uma inspecao, ela aparecera aqui com datas de criacao e edicao."
+              />
             )}
           </div>
         </div>

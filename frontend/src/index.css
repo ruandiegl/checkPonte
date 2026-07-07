@@ -210,14 +210,12 @@ button {
   font-family: inherit;
   background-color: var(--color-bg-card);
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: var(--color-accent);
+  transition: border-color 0.25s, box-shadow 0.2s;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: none;
+  box-shadow: none;
 }
 
 .container {

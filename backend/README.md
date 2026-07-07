@@ -16,7 +16,7 @@ npm install
 cp .env.example .env
 ```
 
-3. Ajuste `DATABASE_URL`, `JWT_SECRET` e `CORS_ORIGIN` no `.env`. O Docker Compose deste projeto publica o Postgres em `localhost:5434`.
+3. Ajuste `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN` e `SEED_DEFAULT_PASSWORD` no `.env`. O Docker Compose deste projeto publica o Postgres em `localhost:5434`.
 
 4. Se não tiver PostgreSQL local, suba o banco pela raiz do projeto:
 
@@ -41,5 +41,7 @@ A API sobe em `http://localhost:3333` e o frontend Vite já faz proxy de `/api` 
 
 ## Usuários seed
 
-- Master: `admin` / `vulcano123`
-- Operador: `operador` / `vulcano123`
+- Master: `admin`
+- Operador: `operador`
+
+A senha inicial dos dois usuários vem de `SEED_DEFAULT_PASSWORD`. Troque esse valor antes de rodar seed em qualquer ambiente compartilhado.

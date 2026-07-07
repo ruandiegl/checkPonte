@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { InputRoot } from '../ui/Input/styles';
 
 export const Field = styled.div`
   margin-bottom: 16px;
@@ -13,17 +14,7 @@ export const Label = styled.label`
   text-transform: uppercase;
 `;
 
-export const Control = styled.input`
+export const Control = styled(InputRoot)`
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--color-input-border);
   border-radius: 4px;
-  background-color: var(--color-input-bg);
-  color: var(--color-text-primary);
-  font-size: 14px;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-accent);
-  }
 `;

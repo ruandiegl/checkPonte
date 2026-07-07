@@ -6,6 +6,7 @@ import { api } from '../../services/api';
 import Navbar from '../../components/Navbar';
 import Button from '../../components/Button';
 import Badge from '../../components/Badge';
+import DatePicker from '../../components/ui/DatePicker';
 import { PageRoot } from './styles';
 import type { DateRange, ExportType, Inspection, ReportData } from '../../types/domain';
 import { getErrorMessage } from '../../types/domain';
@@ -116,24 +117,24 @@ const ReportsPage = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
             <div>
               <label style={{ fontSize: '13px', display: 'block', marginBottom: '5px' }}>Data inicial</label>
-              <input
-                type="date"
+              <DatePicker
                 value={range.from}
-                onChange={(event) => {
+                onChange={(value) => {
                   setPreset('custom');
-                  setRange({ ...range, from: event.target.value });
+                  setRange({ ...range, from: value });
                 }}
+                ariaLabel="Data inicial"
               />
             </div>
             <div>
               <label style={{ fontSize: '13px', display: 'block', marginBottom: '5px' }}>Data final</label>
-              <input
-                type="date"
+              <DatePicker
                 value={range.to}
-                onChange={(event) => {
+                onChange={(value) => {
                   setPreset('custom');
-                  setRange({ ...range, to: event.target.value });
+                  setRange({ ...range, to: value });
                 }}
+                ariaLabel="Data final"
               />
             </div>
             <div style={{ alignSelf: 'end' }}>
